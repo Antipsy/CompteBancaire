@@ -86,4 +86,7 @@ public class GestionnaireCompte {
       throw new EJBTransactionRolledbackException(ex.getLocalizedMessage(), ex);
     }
   }
+  public void supprimer(CompteBancaire compte) {
+    em.remove(em.merge(compte));
+  }
 }

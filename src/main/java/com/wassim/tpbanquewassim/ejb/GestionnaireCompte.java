@@ -6,6 +6,7 @@ package com.wassim.tpbanquewassim.ejb;
 
 import com.wassim.tpbanquewassim.entities.CompteBancaire;
 import jakarta.annotation.sql.DataSourceDefinition;
+import jakarta.ejb.EJBTransactionRolledbackException;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,8 +19,8 @@ import java.util.List;
     name="java:app/jdbc/banque",
     serverName="localhost",
     portNumber=3306,
-    user="root",              // nom et
-    password="root", // mot de passe que vous avez donnés lors de la création de la base de données
+    user="root",              
+    password="root", 
     databaseName="banque",
     properties = {
       "useSSL=false",
@@ -44,5 +45,20 @@ public class GestionnaireCompte {
             = em.createQuery("select count(c) from CompteBancaire c", Long.class);
     return query.getSingleResult();
   }
-    
+     public void transferer(CompteBancaire source, CompteBancaire destination,int montant) {
+    try {
+      source.retirer(montant);
+      destination.deposer(montant);
+      update(source);
+      update(destination);
+    } catch (CompteException ex) {
+      throw new EJBTransactionRolledbackException(ex.getLocalizedMessage(), ex);
+    }
+  }
+     public CompteBancaire update(CompteBancaire compteBancaire) {
+    return em.merge(compteBancaire);
+    }
+    public CompteBancaire findById(long id) {
+    return em.find(CompteBancaire.class, id);
+  }
 }

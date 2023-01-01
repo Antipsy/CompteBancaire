@@ -10,6 +10,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 @DataSourceDefinition (
@@ -32,9 +33,16 @@ public class GestionnaireCompte {
     public void creerCompte(CompteBancaire c){
         em.persist(c);
     }
-     public List<CompteBancaire> getAllComptes(){
-        Query query = em.createNamedQuery("CompteBancaire.findAll");
-        return query.getResultList();
-     }
+    public List<CompteBancaire> getAllComptes() {
+    TypedQuery query
+            = em.createNamedQuery("CompteBancaire.findAll", CompteBancaire.class);
+    return query.getResultList();
+  }
+
+    public long nbComptes() {
+    TypedQuery<Long> query
+            = em.createQuery("select count(c) from CompteBancaire c", Long.class);
+    return query.getSingleResult();
+  }
     
 }

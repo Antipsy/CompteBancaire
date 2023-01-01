@@ -10,7 +10,7 @@ import jakarta.ejb.EJBTransactionRolledbackException;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 
@@ -60,5 +60,30 @@ public class GestionnaireCompte {
     }
     public CompteBancaire findById(long id) {
     return em.find(CompteBancaire.class, id);
+  }
+    /**
+   * Dépôt d'argent sur un compte bancaire.
+   *
+   * @param compteBancaire
+   * @param montant
+   */
+  public void deposer(CompteBancaire compteBancaire, int montant) {
+    compteBancaire.deposer(montant);
+    update(compteBancaire);
+  }
+
+  /**
+   * Retrait d'argent sur un compte bancaire.
+   *
+   * @param compteBancaire
+   * @param montant
+   */
+  public void retirer(CompteBancaire compteBancaire, int montant) {
+    try {
+      compteBancaire.retirer(montant);
+      update(compteBancaire);
+    } catch (CompteException ex) {
+      throw new EJBTransactionRolledbackException(ex.getLocalizedMessage(), ex);
+    }
   }
 }
